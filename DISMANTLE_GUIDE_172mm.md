@@ -1,134 +1,62 @@
-# 172mm (6-3/4") Mud Motor — Dismantle Guide
-## Clogged & Stalled Downhole Recovery
+# 172mm (6-3/4") Mud Motor — Complete Dismantle Guide
+## Clogged & Stalled Downhole Recovery — 9-Step Procedure
 
 ---
 
-## Safety First
-- Secure motor **horizontally** on pipe rack with chain clamps
-- Depressurize completely before any disassembly
-- Wear PPE: gloves, safety glasses, steel-toe boots
-- Motor weight: ~200-300 kg — use crane/forklift for handling
-- Beware of stored energy in dump valve spring
+## Run the interactive guide
+```bash
+cd dismantle-motor && npm run dev
+```
+Open http://localhost:5173 in your browser for the full interactive guide with diagrams, videos, specs, and visual references.
 
 ---
 
-## Components (Top to Bottom)
-1. **Top Sub** — Threaded connection to drill string
-2. **Dump Valve** — Allows mud to drain when pumps off
-3. **Power Section** — Stator (rubber-lined tube) + Rotor (chrome helical shaft)
-4. **Flex / CV Joint** — Converts eccentric rotor motion to concentric
-5. **Bearing Assembly** — Radial + thrust bearings, supports bit load
-6. **Bit Box / Drive Sub** — Connection to drill bit
+## Quick Reference — 9 Steps
+
+| Step | Title | Time | Difficulty |
+|------|-------|------|------------|
+| Overview | Motor Identification & Workspace Setup | 15 min | Familiarization |
+| 1 | Flush & Drain | 30-45 min | Easy |
+| 2 | Remove Top Sub & Dump Valve | 20-30 min | Medium |
+| 3 | Remove Power Section | 30-45 min | Medium-Hard |
+| 4 | Extract Rotor from Stator (CLOG CLEARING) | 30-60 min | Hard |
+| 5 | Remove Bent Housing | 20-30 min | Medium |
+| 6 | Disassemble Transmission / CV Joint | 20-30 min | Medium |
+| 7 | Disassemble Bearing Section | 45-60 min | Hard |
+| 8 | Inspect & Clean All Components | 60-90 min | Experienced |
+| 9 | Reassembly & Flow Testing | 2-3 hours | Hard — Precision |
+
+**Total estimated time: 6-9 hours** (experienced crew, field conditions)
 
 ---
 
-## Step-by-Step Disassembly
+## Torque Specifications
 
-### Step 1: Remove Top Sub
-- Secure motor body in breakout tongs or chain vise
-- Apply 36" pipe wrench to top sub
-- **LEFT-HAND thread** on most models — break out clockwise
-- Remove and inspect pin/box threads for damage
-
-### Step 2: Remove Dump Valve
-- Unscrew dump valve housing with spanner wrench
-- Remove spring and poppet valve
-- Inspect spring for fatigue, poppet for erosion
-- Check valve seat for washout marks
-- Set aside — these are reusable if undamaged
-
-### Step 3: Power Section Disassembly (CRITICAL — Clog Zone)
-
-#### 3A: Separate Stator from Bearing Pack
-1. Clamp bearing housing end in breakout tongs
-2. Apply pipe wrench to stator tube
-3. Unscrew stator from bearing pack connection (RIGHT-HAND thread)
-4. **Support stator as it separates** — very heavy
-5. Slide stator off rotor — pull straight, no side-loading
-6. Rotor remains connected to flex shaft
-
-#### 3B: Clear the Clog
-1. Flush stator interior with high-pressure water
-2. Use wooden or rubber rod to dislodge material — **NO METAL** on rubber lobes
-3. Common clog materials:
-   - Lost Circulation Material (LCM) — nut plug, mica, fiber
-   - Barite sag / settling
-   - Cuttings accumulation
-   - Rubber chunks from stator damage
-4. Clean rotor chrome surface — check for scoring/pitting
-5. If rotor is seized: soak with penetrating oil, let sit 30 min, rotate by hand
-
-#### 3C: Inspect for Damage
-- **Stator rubber**: Look for tears, chunks missing, swelling, delamination
-- **Rotor chrome**: Check for scoring, pitting, corrosion, wear marks
-- **Fit test**: Slide rotor back in — should rotate with slight interference fit
-- If rubber is damaged, stator needs replacement
-
-### Step 4: Flex / CV Joint
-1. Clamp bearing housing in vise/tongs
-2. Unscrew flex joint housing (RIGHT-HAND thread)
-3. Slide flex shaft out
-4. Inspect U-joints or CV joint for:
-   - Cracked rubber boot
-   - Grease leaks
-   - Excessive play/looseness
-5. Check flex shaft splines for stripping or twist-off damage
-6. Clean all mating surfaces and threads
-
-### Step 5: Bearing Assembly
-1. Remove bearing housing retaining ring (snap ring pliers)
-2. Press mandrel/drive shaft out of bearing pack (hydraulic press)
-3. Inspect:
-   - **Radial bearings**: Check for play, rough rotation
-   - **Thrust bearings**: Check for pitting, spalling
-   - **Shaft seals**: Look for damage, leaking
-   - **Mandrel**: Measure runout (max 0.010" / 0.25mm)
-4. Replace seals and O-rings as standard practice
+| Connection | Torque | Thread |
+|---|---|---|
+| Top Sub | 8,000 - 15,000 ft-lbs | LEFT-HAND (most models) |
+| Power Section to Bent Housing | 8,000 - 12,000 ft-lbs | RIGHT-HAND |
+| Bent Housing to Transmission | 6,000 - 10,000 ft-lbs | RIGHT-HAND |
+| Bearing Housing to Bit Box | 5,000 - 8,000 ft-lbs | RIGHT-HAND |
+| Dump Valve | Hand-tight + 1/4 turn | RIGHT-HAND |
 
 ---
 
-## Reassembly (Reverse Order — Bottom to Top)
+## Common Clog Locations (90%+ of stalls)
 
-1. **Bit Box** — Install drive sub
-2. **Bearing Pack** — New seals, press mandrel in, install retaining ring
-3. **Flex Joint** — Grease CV/U-joints, connect to bearing assembly
-4. **Rotor into Stator** — Lubricate with mud or mineral oil, slide in straight
-5. **Dump Valve** — Install spring + poppet, hand-tight + 1/4 turn
-6. **Top Sub** — Apply API thread compound, torque to spec
-
-### Torque Specifications (172mm / 6-3/4")
-| Connection | Torque |
-|---|---|
-| Top Sub | 8,000 - 12,000 ft-lbs |
-| Stator to Bearing Housing | 6,000 - 10,000 ft-lbs |
-| Bearing Housing to Bit Box | 5,000 - 8,000 ft-lbs |
-| Dump Valve | Hand-tight + 1/4 turn |
-
-**Apply API modified thread compound on ALL threaded connections.**
+1. **Dump valve ports** — solids settle when pumps cycle off
+2. **Rotor-stator cavities** — LCM, barite, cuttings pack the helix
+3. **Flow restrictor orifice** — fine sand blocks bearing lubrication
+4. **Bit box / bit nozzles** — formation cuttings pack around the bit
 
 ---
 
-## Pre-Run Checks
-1. **Flow test**: Pump water at low rate — verify dump valve closes, no leaks at connections
-2. **Rotor rotation**: Turn by hand — should rotate smoothly with slight resistance
-3. **Stall test**: Apply light brake to bit box — motor should stall evenly, no vibration
-4. **Pressure test**: Pump at operating flow rate — confirm differential pressure is within spec
+## Motor Specifications (172mm)
 
----
-
-## Tools Required
-- 36" pipe wrench (x2)
-- Chain tongs / breakout tongs
-- Spanner wrench (dump valve)
-- Hydraulic press (bearing removal)
-- Snap ring pliers
-- Torque wrench (high-range)
-- Dial indicator (mandrel runout)
-- High-pressure washer
-
-## Consumables
-- API thread compound
-- O-ring kit (motor-specific)
-- Bearing grease
-- Penetrating oil
-- Rubber-safe lubricant (stator)
+- OD: 172mm (6-3/4")
+- Length: 7.0 - 9.5 meters
+- Weight: 300 - 450 kg assembled
+- Operating flow: 1,100 - 2,200 LPM
+- Max RPM: 80 - 350 (depends on lobe config)
+- Max torque: 8,000 - 22,000 N-m
+- Common lobe configs: 5:6, 7:8, 9:10
