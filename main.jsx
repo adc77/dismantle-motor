@@ -1,4 +1,213 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+
+import slide12 from "./images/1-2.png";
+import slide3 from "./images/3.png";
+import slide45 from "./images/4-5.png";
+import slide6 from "./images/6.png";
+
+const tutorialSlides = [
+  {
+    title: "Slides 1-2 — Exploded View + Top Sub",
+    subtitle: "Overall components and first break point",
+    src: slide12,
+  },
+  {
+    title: "Slide 3 — Power Section Clog Zone",
+    subtitle: "Inspect rotor/stator path and lock points",
+    src: slide3,
+  },
+  {
+    title: "Slides 4-5 — Flex Joint + Bearings",
+    subtitle: "Transmission wear faces and bearing stack",
+    src: slide45,
+  },
+  {
+    title: "Slide 6 — Reassembly + Torque",
+    subtitle: "Final sequence and torque checkpoints",
+    src: slide6,
+  },
+];
+
+function ImageTutorialSlider({ slides, accentColor }) {
+  const [index, setIndex] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startXRef = useRef(null);
+  const threshold = 60;
+
+  const clampIndex = (next) => Math.max(0, Math.min(slides.length - 1, next));
+
+  const moveTo = (next) => {
+    setIndex(clampIndex(next));
+    setDragOffset(0);
+  };
+
+  const onPointerDown = (e) => {
+    startXRef.current = e.clientX;
+    setIsDragging(true);
+    if (e.currentTarget.setPointerCapture) {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    }
+  };
+
+  const onPointerMove = (e) => {
+    if (!isDragging || startXRef.current == null) return;
+    setDragOffset(e.clientX - startXRef.current);
+  };
+
+  const onPointerUp = () => {
+    if (!isDragging) return;
+
+    if (dragOffset <= -threshold) moveTo(index + 1);
+    else if (dragOffset >= threshold) moveTo(index - 1);
+    else setDragOffset(0);
+
+    startXRef.current = null;
+    setIsDragging(false);
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          background: "#0d1117",
+          border: `1px solid ${accentColor}33`,
+          borderRadius: "6px",
+          padding: "12px",
+          marginBottom: "14px",
+          boxShadow: `0 0 30px ${accentColor}11`,
+        }}
+      >
+        <div
+          style={{
+            fontSize: "10px",
+            color: accentColor,
+            letterSpacing: "2px",
+            marginBottom: "8px",
+          }}
+        >
+          IMAGE TUTORIAL — SWIPE LEFT/RIGHT
+        </div>
+
+        <div
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          style={{
+            overflow: "hidden",
+            borderRadius: "6px",
+            border: "1px solid #21262d",
+            touchAction: "pan-y",
+            background: "#0b0f14",
+            userSelect: "none",
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              transform: `translateX(calc(${-index * 100}% + ${dragOffset}px))`,
+              transition: isDragging ? "none" : "transform 0.25s ease-out",
+            }}
+          >
+            {slides.map((slide) => (
+              <div
+                key={slide.title}
+                style={{
+                  minWidth: "100%",
+                  padding: "10px",
+                }}
+              >
+                <img
+                  src={slide.src}
+                  alt={slide.title}
+                  style={{
+                    width: "100%",
+                    maxHeight: "520px",
+                    objectFit: "contain",
+                    background: "#11161d",
+                    borderRadius: "4px",
+                  }}
+                  draggable={false}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginTop: "10px", marginBottom: "8px" }}>
+          <div style={{ fontSize: "12px", color: "#e2e8f0", marginBottom: "3px" }}>
+            {slides[index].title}
+          </div>
+          <div style={{ fontSize: "10px", color: "#8b949e" }}>
+            {slides[index].subtitle}
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "8px",
+          }}
+        >
+          <button
+            onClick={() => moveTo(index - 1)}
+            disabled={index === 0}
+            style={{
+              padding: "8px 14px",
+              background: index === 0 ? "#21262d" : "#161b22",
+              border: `1px solid ${index === 0 ? "#30363d" : accentColor}`,
+              borderRadius: "4px",
+              color: index === 0 ? "#6e7681" : accentColor,
+              cursor: index === 0 ? "not-allowed" : "pointer",
+              fontSize: "10px",
+              letterSpacing: "1px",
+            }}
+          >
+            ← PREV PAGE
+          </button>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            {slides.map((slide, dotIdx) => (
+              <div
+                key={slide.title}
+                onClick={() => moveTo(dotIdx)}
+                style={{
+                  width: dotIdx === index ? "20px" : "6px",
+                  height: "6px",
+                  borderRadius: "3px",
+                  background: dotIdx === index ? accentColor : "#30363d",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => moveTo(index + 1)}
+            disabled={index === slides.length - 1}
+            style={{
+              padding: "8px 14px",
+              background: index === slides.length - 1 ? "#21262d" : "#161b22",
+              border: `1px solid ${index === slides.length - 1 ? "#30363d" : accentColor}`,
+              borderRadius: "4px",
+              color: index === slides.length - 1 ? "#6e7681" : accentColor,
+              cursor: index === slides.length - 1 ? "not-allowed" : "pointer",
+              fontSize: "10px",
+              letterSpacing: "1px",
+            }}
+          >
+            NEXT PAGE →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const steps = [
   {
@@ -496,6 +705,19 @@ const steps = [
       </svg>
     ),
   },
+  {
+    id: 11,
+    title: "Image Tutorial",
+    subtitle: "Swipe through field-ready visual pages",
+    color: "#00d4ff",
+    description: "Use this photo walkthrough as a fast practical guide in the yard. Swipe left/right to move between pages in order. Each page maps to the dismantle sequence from component overview through reassembly checks.",
+    warnings: [
+      "Swipe left or right on image area to move to next or previous page",
+      "Use page dots for quick jumps to a specific diagram",
+      "Confirm each step physically before moving to next page",
+    ],
+    slides: tutorialSlides,
+  },
 ];
 
 export default function MudMotorDiagram() {
@@ -603,17 +825,21 @@ export default function MudMotorDiagram() {
             </div>
           </div>
 
-          {/* Diagram box */}
-          <div style={{
-            background: "#0d1117",
-            border: `1px solid ${step.color}33`,
-            borderRadius: "6px",
-            padding: "20px",
-            marginBottom: "20px",
-            boxShadow: `0 0 30px ${step.color}11`,
-          }}>
-            <step.diagram />
-          </div>
+          {/* Diagram / image tutorial */}
+          {step.slides ? (
+            <ImageTutorialSlider slides={step.slides} accentColor={step.color} />
+          ) : (
+            <div style={{
+              background: "#0d1117",
+              border: `1px solid ${step.color}33`,
+              borderRadius: "6px",
+              padding: "20px",
+              marginBottom: "20px",
+              boxShadow: `0 0 30px ${step.color}11`,
+            }}>
+              <step.diagram />
+            </div>
+          )}
 
           {/* Description */}
           <div style={{
