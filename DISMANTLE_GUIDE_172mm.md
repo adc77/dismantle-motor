@@ -60,3 +60,4 @@ Open http://localhost:5173 in your browser for the full interactive guide with d
 - Max RPM: 80 - 350 (depends on lobe config)
 - Max torque: 8,000 - 22,000 N-m
 - Common lobe configs: 5:6, 7:8, 9:10
+
