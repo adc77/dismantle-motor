@@ -12,19 +12,6 @@ const tutorialSlides = [
   { title: "Reassembly + Torque", subtitle: "Final sequence and torque checkpoints", src: slide6 },
 ];
 
-// ─── YouTube video IDs for each step ───
-const videos = {
-  overview: "dLGaXFmcfmE",    // PDM mud motor overview
-  flush: "QK7J3mMdYfI",        // Mud motor maintenance
-  topsub: "rF2xCnRSTbo",       // Top sub removal
-  power: "Fmq5v1V0gZU",        // Power section disassembly
-  rotor: "5q8j9Xvyrqo",        // Rotor extraction
-  bent: "3AvYf8GUwGA",         // Bent housing adjustment
-  transmission: "y2wMIYkQ7Qs", // CV joint / transmission
-  bearing: "kxIEJdU1u6o",      // Bearing section teardown
-  inspect: "YxV0EPSzf1o",      // Inspection & reassembly
-};
-
 // ─── 9 Steps Data ───
 const steps = [
   // ──────────────────── OVERVIEW ────────────────────
@@ -35,7 +22,6 @@ const steps = [
     color: "#00d4ff",
     timeEstimate: "15 min",
     difficulty: "Familiarization",
-    videoId: videos.overview,
     tools: [],
     description: `The 172mm (6-3/4") positive displacement mud motor (PDM) converts hydraulic energy from drilling mud into mechanical rotation at the bit. It consists of 6 main sections assembled end-to-end, each with specific threaded connections and torque requirements.
 
@@ -115,7 +101,6 @@ A 172mm motor is typically 7-9 meters long and weighs 300-450 kg fully assembled
     color: "#f6ad55",
     timeEstimate: "30-45 min",
     difficulty: "Easy",
-    videoId: videos.flush,
     tools: [
       "High-pressure washer (2,000+ PSI)",
       "Pipe rack or V-blocks (rated for 500kg)",
@@ -200,7 +185,6 @@ After flushing, let the motor drain for a minimum of 15 minutes. During this tim
     color: "#68d391",
     timeEstimate: "20-30 min",
     difficulty: "Medium",
-    videoId: videos.topsub,
     tools: [
       "36\" pipe wrench (x2)",
       "Chain tongs (rated for 172mm OD)",
@@ -284,7 +268,6 @@ The dump valve ports are a common clog location because solids settle into the p
     color: "#00d4ff",
     timeEstimate: "30-45 min",
     difficulty: "Medium-Hard",
-    videoId: videos.power,
     tools: [
       "Breakout tongs (hydraulic, rated for 15,000+ ft-lbs)",
       "Chain tongs (backup)",
@@ -359,7 +342,6 @@ The rotor remains inside the stator at this point — you're removing the entire
     color: "#fc8181",
     timeEstimate: "30-60 min (longer if seized)",
     difficulty: "Hard",
-    videoId: videos.rotor,
     tools: [
       "Padded bench vise or stator holding fixture",
       "Penetrating oil (PB Blaster, WD-40, or diesel)",
@@ -452,7 +434,6 @@ After extraction, inspect BOTH the rotor and stator thoroughly. This inspection 
     color: "#b794f4",
     timeEstimate: "20-30 min",
     difficulty: "Medium",
-    videoId: videos.bent,
     tools: [
       "Spanner wrench (for bent housing lock ring)",
       "Breakout tongs or chain tongs",
@@ -530,7 +511,6 @@ Record: (1) the angle reading from the index marks, (2) photograph the alignment
     color: "#f6ad55",
     timeEstimate: "20-30 min",
     difficulty: "Medium",
-    videoId: videos.transmission,
     tools: [
       "Breakout tongs or chain tongs",
       "36\" pipe wrench",
@@ -615,7 +595,6 @@ The transmission housing connects to the bent housing above and the bearing sect
     color: "#68d391",
     timeEstimate: "45-60 min",
     difficulty: "Hard",
-    videoId: videos.bearing,
     tools: [
       "Hydraulic press (10+ ton capacity)",
       "Bearing mandrel puller (OEM specific or universal)",
@@ -719,7 +698,6 @@ For sealed-bearing designs: the bearing section is pre-packed with grease and se
     color: "#00d4ff",
     timeEstimate: "60-90 min",
     difficulty: "Requires experience",
-    videoId: videos.inspect,
     tools: [
       "Parts wash tank with diesel or biodegradable solvent",
       "High-pressure washer",
@@ -816,7 +794,6 @@ Key measurements for the GO/NO-GO decision:
     color: "#fc8181",
     timeEstimate: "2-3 hours",
     difficulty: "Hard — requires precision",
-    videoId: videos.inspect,
     tools: [
       "Calibrated torque wrench (high-range: 0-15,000 ft-lbs)",
       "Chain tongs / breakout tongs",
@@ -932,7 +909,6 @@ COMMON CLOG LOCATIONS (for reference): These four areas account for 90%+ of clog
     color: "#00d4ff",
     timeEstimate: "",
     difficulty: "",
-    videoId: null,
     tools: [],
     description: "Use this visual walkthrough as a quick reference in the yard. Swipe left/right to move between pages. Each page maps to the disassembly sequence from component overview through reassembly checks.",
     substeps: [],
@@ -1007,23 +983,6 @@ function CollapsibleSection({ title, color, defaultOpen, children }) {
   );
 }
 
-function VideoEmbed({ videoId, color }) {
-  if (!videoId) return null;
-  return (
-    <div style={{ marginBottom: "14px" }}>
-      <div style={{ fontSize: "10px", color: color, letterSpacing: "2px", marginBottom: "8px", fontFamily: "monospace" }}>VIDEO REFERENCE</div>
-      <div style={{ position: "relative", paddingBottom: "56.25%", borderRadius: "6px", overflow: "hidden", border: "1px solid #21262d" }}>
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}`}
-          title="Video reference"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-        />
-      </div>
-    </div>
-  );
-}
 
 
 // ═══════════════════════════════════════════════════
@@ -1104,9 +1063,6 @@ export default function MudMotorDiagram() {
               <step.diagram />
             </div>
           )}
-
-          {/* Video */}
-          {step.videoId && <VideoEmbed videoId={step.videoId} color={step.color} />}
 
           {/* Description */}
           <div style={{ background: "#161b22", border: "1px solid #21262d", borderRadius: "6px", padding: "16px", marginBottom: "16px", fontSize: "12px", lineHeight: "1.8", color: "#c9d1d9", whiteSpace: "pre-line" }}>
