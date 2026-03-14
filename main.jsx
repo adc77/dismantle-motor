@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 import slide12 from "./images/1-2.png";
 import slide3 from "./images/3.png";
@@ -925,6 +925,23 @@ COMMON CLOG LOCATIONS (for reference): These four areas account for 90%+ of clog
 
 
 // ═══════════════════════════════════════════════════
+//  HOOKS
+// ═══════════════════════════════════════════════════
+
+function useIsMobile(breakpoint = 768) {
+  const [mobile, setMobile] = useState(typeof window !== "undefined" && window.innerWidth < breakpoint);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const handler = (e) => setMobile(e.matches);
+    mq.addEventListener("change", handler);
+    setMobile(mq.matches);
+    return () => mq.removeEventListener("change", handler);
+  }, [breakpoint]);
+  return mobile;
+}
+
+
+// ═══════════════════════════════════════════════════
 //  UI COMPONENTS
 // ═══════════════════════════════════════════════════
 
@@ -975,14 +992,90 @@ function CollapsibleSection({ title, color, defaultOpen, children }) {
   return (
     <div style={{ background: "#161b22", border: "1px solid #21262d", borderRadius: "6px", marginBottom: "12px", overflow: "hidden" }}>
       <button onClick={() => setOpen(!open)} style={{ width: "100%", textAlign: "left", background: "transparent", border: "none", padding: "12px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: "10px" }}>
-        <span style={{ color: color || "#6e7681", fontSize: "12px", transition: "transform 0.2s", transform: open ? "rotate(90deg)" : "rotate(0deg)", display: "inline-block" }}>&#9654;</span>
-        <span style={{ fontSize: "10px", color: color || "#8b949e", letterSpacing: "2px", fontFamily: "monospace", fontWeight: "bold" }}>{title}</span>
+        <span style={{ color: color || "#6e7681", fontSize: "14px", transition: "transform 0.2s", transform: open ? "rotate(90deg)" : "rotate(0deg)", display: "inline-block" }}>&#9654;</span>
+        <span style={{ fontSize: "11px", color: color || "#8b949e", letterSpacing: "2px", fontFamily: "monospace", fontWeight: "bold" }}>{title}</span>
       </button>
       {open && <div style={{ padding: "0 16px 16px 16px" }}>{children}</div>}
     </div>
   );
 }
 
+function MobileNav({ steps, active, setActive, step, sidebarOpen, setSidebarOpen }) {
+  return (
+    <>
+      {/* Mobile top bar with hamburger + step info */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: "10px",
+        padding: "10px 14px", background: "#161b22", borderBottom: "1px solid #21262d",
+      }}>
+        <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{
+          background: "none", border: `1px solid ${step.color}55`, borderRadius: "4px",
+          color: step.color, padding: "6px 10px", cursor: "pointer", fontSize: "16px", lineHeight: 1,
+        }}>
+          {sidebarOpen ? "\u2715" : "\u2630"}
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: "10px", color: step.color, letterSpacing: "2px", fontFamily: "monospace" }}>
+            {active === 0 ? "OVERVIEW" : active === steps.length - 1 ? "VISUAL REF" : `STEP ${active} / ${steps.length - 2}`}
+          </div>
+          <div style={{ fontSize: "13px", color: "#e2e8f0", fontFamily: "monospace", fontWeight: "bold", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {step.title.replace(/Step \d+ — /, "")}
+          </div>
+        </div>
+        {step.timeEstimate && (
+          <div style={{ fontSize: "9px", color: "#8b949e", background: "#21262d", padding: "3px 8px", borderRadius: "10px", whiteSpace: "nowrap", fontFamily: "monospace" }}>
+            {step.timeEstimate}
+          </div>
+        )}
+      </div>
+
+      {/* Slide-down sidebar overlay */}
+      {sidebarOpen && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 100,
+          background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
+        }} onClick={() => setSidebarOpen(false)}>
+          <div style={{
+            background: "#0d1117", borderBottom: "2px solid #21262d", maxHeight: "70vh", overflowY: "auto",
+          }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: "14px 16px", borderBottom: "1px solid #21262d", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ fontSize: "11px", color: "#00d4ff", letterSpacing: "2px", fontFamily: "monospace", fontWeight: "bold" }}>SELECT STEP</div>
+              <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#6e7681", fontSize: "18px", cursor: "pointer", padding: "4px" }}>{"\u2715"}</button>
+            </div>
+            {steps.map((s, i) => (
+              <button key={i} onClick={() => { setActive(i); setSidebarOpen(false); }} style={{
+                display: "block", width: "100%", textAlign: "left",
+                background: active === i ? "#161b22" : "transparent",
+                border: "none", borderLeft: active === i ? `3px solid ${s.color}` : "3px solid transparent",
+                padding: "12px 16px", cursor: "pointer",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{
+                    minWidth: "28px", height: "28px", borderRadius: "50%",
+                    background: active === i ? `${s.color}30` : "#21262d",
+                    border: `1px solid ${active === i ? s.color : "#30363d"}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "11px", color: active === i ? s.color : "#6e7681", fontFamily: "monospace", fontWeight: "bold",
+                  }}>
+                    {i === 0 ? "O" : i === steps.length - 1 ? "V" : i}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: "13px", color: active === i ? "#e2e8f0" : "#8b949e", fontFamily: "monospace", lineHeight: "1.3" }}>
+                      {s.title.replace(/Step \d+ — /, "")}
+                    </div>
+                    {s.timeEstimate && (
+                      <div style={{ fontSize: "10px", color: "#6e7681", marginTop: "2px", fontFamily: "monospace" }}>{s.timeEstimate}</div>
+                    )}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 
 // ═══════════════════════════════════════════════════
@@ -991,97 +1084,134 @@ function CollapsibleSection({ title, color, defaultOpen, children }) {
 
 export default function MudMotorDiagram() {
   const [active, setActive] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
   const step = steps[active];
+
+  const m = isMobile; // shorthand
 
   return (
     <div style={{ background: "#0d1117", minHeight: "100vh", fontFamily: "monospace", color: "#e2e8f0", padding: "0" }}>
-      {/* ── Header ── */}
-      <div style={{ background: "#161b22", borderBottom: "1px solid #30363d", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px" }}>
-        <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#00d4ff", boxShadow: "0 0 10px #00d4ff" }} />
-        <div>
-          <div style={{ fontSize: "13px", color: "#00d4ff", letterSpacing: "3px", fontWeight: "bold" }}>PDM DISASSEMBLY GUIDE</div>
-          <div style={{ fontSize: "10px", color: "#6e7681", letterSpacing: "2px" }}>172mm DOWNHOLE MUD MOTOR — CLOG RECOVERY PROCEDURE</div>
-        </div>
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
-          {step.timeEstimate && (
-            <div style={{ fontSize: "10px", color: "#8b949e", background: "#21262d", padding: "4px 10px", borderRadius: "12px" }}>
-              {step.timeEstimate}
+      {/* ── Header (desktop) ── */}
+      {!m && (
+        <div style={{ background: "#161b22", borderBottom: "1px solid #30363d", padding: "16px 24px", display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#00d4ff", boxShadow: "0 0 10px #00d4ff" }} />
+          <div>
+            <div style={{ fontSize: "13px", color: "#00d4ff", letterSpacing: "3px", fontWeight: "bold" }}>PDM DISASSEMBLY GUIDE</div>
+            <div style={{ fontSize: "10px", color: "#6e7681", letterSpacing: "2px" }}>172mm DOWNHOLE MUD MOTOR — CLOG RECOVERY PROCEDURE</div>
+          </div>
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
+            {step.timeEstimate && (
+              <div style={{ fontSize: "10px", color: "#8b949e", background: "#21262d", padding: "4px 10px", borderRadius: "12px" }}>{step.timeEstimate}</div>
+            )}
+            {step.difficulty && (
+              <div style={{ fontSize: "10px", color: step.color, background: `${step.color}15`, padding: "4px 10px", borderRadius: "12px", border: `1px solid ${step.color}33` }}>{step.difficulty}</div>
+            )}
+            <div style={{ fontSize: "10px", color: "#6e7681" }}>
+              {active === 0 ? "OVERVIEW" : active === steps.length - 1 ? "VISUAL REF" : `STEP ${active} / ${steps.length - 2}`}
             </div>
-          )}
-          {step.difficulty && (
-            <div style={{ fontSize: "10px", color: step.color, background: `${step.color}15`, padding: "4px 10px", borderRadius: "12px", border: `1px solid ${step.color}33` }}>
-              {step.difficulty}
-            </div>
-          )}
-          <div style={{ fontSize: "10px", color: "#6e7681" }}>
-            {active === 0 ? "OVERVIEW" : active === steps.length - 1 ? "VISUAL REF" : `STEP ${active} / ${steps.length - 2}`}
           </div>
         </div>
-      </div>
+      )}
 
-      <div style={{ display: "flex", height: "calc(100vh - 57px)" }}>
-        {/* ── Sidebar ── */}
-        <div style={{ width: "240px", minWidth: "240px", background: "#0d1117", borderRight: "1px solid #21262d", overflowY: "auto", padding: "8px 0" }}>
-          {steps.map((s, i) => (
-            <button key={i} onClick={() => setActive(i)} style={{
-              display: "block", width: "100%", textAlign: "left",
-              background: active === i ? "#161b22" : "transparent",
-              border: "none", borderLeft: active === i ? `3px solid ${s.color}` : "3px solid transparent",
-              padding: "10px 14px", cursor: "pointer", transition: "all 0.15s",
-            }}>
-              <div style={{ fontSize: "9px", color: active === i ? s.color : "#6e7681", letterSpacing: "2px", marginBottom: "2px", fontFamily: "monospace" }}>
-                {i === 0 ? "OVERVIEW" : i === steps.length - 1 ? "VISUAL REF" : `STEP ${i}`}
-              </div>
-              <div style={{ fontSize: "11px", color: active === i ? "#e2e8f0" : "#8b949e", lineHeight: "1.3", fontFamily: "monospace" }}>
-                {s.title.replace(/Step \d+ — /, "")}
-              </div>
-              {s.timeEstimate && (
-                <div style={{ fontSize: "9px", color: "#6e7681", marginTop: "2px", fontFamily: "monospace" }}>
-                  {s.timeEstimate}
-                </div>
-              )}
-            </button>
-          ))}
+      {/* ── Mobile Header ── */}
+      {m && (
+        <div style={{ background: "#161b22", borderBottom: "1px solid #30363d", padding: "10px 14px" }}>
+          <div style={{ fontSize: "11px", color: "#00d4ff", letterSpacing: "2px", fontWeight: "bold" }}>PDM DISASSEMBLY GUIDE</div>
+          <div style={{ fontSize: "9px", color: "#6e7681", letterSpacing: "1px" }}>172mm MUD MOTOR — CLOG RECOVERY</div>
         </div>
+      )}
+
+      {/* ── Mobile Nav ── */}
+      {m && <MobileNav steps={steps} active={active} setActive={setActive} step={step} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />}
+
+      <div style={{ display: "flex", height: m ? "auto" : "calc(100vh - 57px)", minHeight: m ? "calc(100vh - 110px)" : undefined }}>
+        {/* ── Sidebar (desktop only) ── */}
+        {!m && (
+          <div style={{ width: "240px", minWidth: "240px", background: "#0d1117", borderRight: "1px solid #21262d", overflowY: "auto", padding: "8px 0" }}>
+            {steps.map((s, i) => (
+              <button key={i} onClick={() => setActive(i)} style={{
+                display: "block", width: "100%", textAlign: "left",
+                background: active === i ? "#161b22" : "transparent",
+                border: "none", borderLeft: active === i ? `3px solid ${s.color}` : "3px solid transparent",
+                padding: "10px 14px", cursor: "pointer", transition: "all 0.15s",
+              }}>
+                <div style={{ fontSize: "9px", color: active === i ? s.color : "#6e7681", letterSpacing: "2px", marginBottom: "2px", fontFamily: "monospace" }}>
+                  {i === 0 ? "OVERVIEW" : i === steps.length - 1 ? "VISUAL REF" : `STEP ${i}`}
+                </div>
+                <div style={{ fontSize: "11px", color: active === i ? "#e2e8f0" : "#8b949e", lineHeight: "1.3", fontFamily: "monospace" }}>
+                  {s.title.replace(/Step \d+ — /, "")}
+                </div>
+                {s.timeEstimate && (
+                  <div style={{ fontSize: "9px", color: "#6e7681", marginTop: "2px", fontFamily: "monospace" }}>{s.timeEstimate}</div>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* ── Main Content ── */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
+        <div style={{ flex: 1, overflowY: m ? "visible" : "auto", padding: m ? "16px 12px" : "24px" }}>
           {/* Step header */}
-          <div style={{ marginBottom: "20px" }}>
-            <div style={{ fontSize: "10px", color: step.color, letterSpacing: "3px", marginBottom: "4px" }}>
+          <div style={{ marginBottom: m ? "14px" : "20px" }}>
+            <div style={{ fontSize: m ? "11px" : "10px", color: step.color, letterSpacing: "3px", marginBottom: "4px" }}>
               {active === 0 ? "OVERVIEW" : active === steps.length - 1 ? "VISUAL REFERENCE" : `STEP ${active} OF ${steps.length - 2}`}
             </div>
-            <div style={{ fontSize: "20px", fontWeight: "bold", color: "#e2e8f0", marginBottom: "4px" }}>{step.title}</div>
-            <div style={{ fontSize: "11px", color: "#6e7681", letterSpacing: "1px" }}>{step.subtitle}</div>
+            <div style={{ fontSize: m ? "18px" : "20px", fontWeight: "bold", color: "#e2e8f0", marginBottom: "4px" }}>{step.title}</div>
+            <div style={{ fontSize: m ? "12px" : "11px", color: "#6e7681", letterSpacing: "1px", lineHeight: "1.4" }}>{step.subtitle}</div>
+            {/* Mobile badges */}
+            {m && (step.timeEstimate || step.difficulty) && (
+              <div style={{ display: "flex", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
+                {step.timeEstimate && (
+                  <div style={{ fontSize: "10px", color: "#8b949e", background: "#21262d", padding: "3px 10px", borderRadius: "10px" }}>{step.timeEstimate}</div>
+                )}
+                {step.difficulty && (
+                  <div style={{ fontSize: "10px", color: step.color, background: `${step.color}15`, padding: "3px 10px", borderRadius: "10px", border: `1px solid ${step.color}33` }}>{step.difficulty}</div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Diagram or Image Tutorial */}
           {step.slides ? (
             <ImageTutorialSlider slides={step.slides} accentColor={step.color} />
           ) : (
-            <div style={{ background: "#0d1117", border: `1px solid ${step.color}33`, borderRadius: "6px", padding: "20px", marginBottom: "20px", boxShadow: `0 0 30px ${step.color}11` }}>
+            <div style={{ background: "#0d1117", border: `1px solid ${step.color}33`, borderRadius: "6px", padding: m ? "10px" : "20px", marginBottom: m ? "14px" : "20px", boxShadow: `0 0 30px ${step.color}11`, overflowX: "auto" }}>
               <step.diagram />
             </div>
           )}
 
           {/* Description */}
-          <div style={{ background: "#161b22", border: "1px solid #21262d", borderRadius: "6px", padding: "16px", marginBottom: "16px", fontSize: "12px", lineHeight: "1.8", color: "#c9d1d9", whiteSpace: "pre-line" }}>
+          <div style={{
+            background: "#161b22", border: "1px solid #21262d", borderRadius: "6px",
+            padding: m ? "14px" : "16px", marginBottom: m ? "12px" : "16px",
+            fontSize: m ? "13px" : "12px", lineHeight: m ? "1.9" : "1.8", color: "#c9d1d9", whiteSpace: "pre-line",
+          }}>
             {step.description}
           </div>
 
           {/* Substeps */}
           {step.substeps && step.substeps.length > 0 && (
-            <CollapsibleSection title={`DETAILED PROCEDURE (${step.substeps.length} sub-steps)`} color={step.color} defaultOpen={true}>
+            <CollapsibleSection title={`DETAILED PROCEDURE (${step.substeps.length} sub-steps)`} color={step.color} defaultOpen={!m}>
               {step.substeps.map((sub, i) => (
                 <div key={i} style={{ marginBottom: "16px", paddingBottom: "16px", borderBottom: i < step.substeps.length - 1 ? "1px solid #21262d" : "none" }}>
-                  <div style={{ display: "flex", gap: "12px", marginBottom: "6px" }}>
-                    <div style={{ minWidth: "28px", height: "28px", borderRadius: "50%", background: `${step.color}20`, border: `1px solid ${step.color}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", color: step.color, fontWeight: "bold" }}>
+                  <div style={{ display: "flex", gap: m ? "10px" : "12px", marginBottom: "6px" }}>
+                    <div style={{
+                      minWidth: m ? "26px" : "28px", height: m ? "26px" : "28px", borderRadius: "50%",
+                      background: `${step.color}20`, border: `1px solid ${step.color}55`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: m ? "12px" : "11px", color: step.color, fontWeight: "bold", flexShrink: 0,
+                    }}>
                       {i + 1}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#e2e8f0", lineHeight: "1.7", paddingTop: "4px" }}>{sub.text}</div>
+                    <div style={{ fontSize: m ? "13px" : "12px", color: "#e2e8f0", lineHeight: m ? "1.8" : "1.7", paddingTop: "3px" }}>{sub.text}</div>
                   </div>
                   {sub.note && (
-                    <div style={{ marginLeft: "40px", fontSize: "11px", color: "#8b949e", lineHeight: "1.5", fontStyle: "italic", borderLeft: `2px solid ${step.color}33`, paddingLeft: "10px" }}>
+                    <div style={{
+                      marginLeft: m ? "36px" : "40px", fontSize: m ? "12px" : "11px",
+                      color: "#8b949e", lineHeight: "1.6", fontStyle: "italic",
+                      borderLeft: `2px solid ${step.color}33`, paddingLeft: "10px",
+                    }}>
                       {sub.note}
                     </div>
                   )}
@@ -1093,9 +1223,9 @@ export default function MudMotorDiagram() {
           {/* Tools */}
           {step.tools && step.tools.length > 0 && (
             <CollapsibleSection title={`TOOLS REQUIRED (${step.tools.length})`} color="#f6ad55">
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "1fr 1fr", gap: m ? "8px" : "6px" }}>
                 {step.tools.map((tool, i) => (
-                  <div key={i} style={{ fontSize: "11px", color: "#c9d1d9", display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                  <div key={i} style={{ fontSize: m ? "12px" : "11px", color: "#c9d1d9", display: "flex", gap: "8px", alignItems: "flex-start" }}>
                     <span style={{ color: "#f6ad55", minWidth: "12px" }}>+</span>
                     <span>{tool}</span>
                   </div>
@@ -1107,11 +1237,11 @@ export default function MudMotorDiagram() {
           {/* Specifications */}
           {step.specs && Object.keys(step.specs).length > 0 && (
             <CollapsibleSection title="SPECIFICATIONS" color="#00d4ff">
-              <table style={{ width: "100%", fontSize: "11px", borderCollapse: "collapse" }}>
+              <table style={{ width: "100%", fontSize: m ? "12px" : "11px", borderCollapse: "collapse" }}>
                 <tbody>
                   {Object.entries(step.specs).map(([key, val], i) => (
                     <tr key={i} style={{ borderBottom: "1px solid #21262d" }}>
-                      <td style={{ padding: "6px 12px 6px 0", color: "#8b949e", whiteSpace: "nowrap", verticalAlign: "top" }}>{key}</td>
+                      <td style={{ padding: "6px 12px 6px 0", color: "#8b949e", whiteSpace: m ? "normal" : "nowrap", verticalAlign: "top", width: m ? "40%" : undefined }}>{key}</td>
                       <td style={{ padding: "6px 0", color: "#e2e8f0" }}>{val}</td>
                     </tr>
                   ))}
@@ -1122,13 +1252,13 @@ export default function MudMotorDiagram() {
 
           {/* Warnings */}
           {step.warnings && step.warnings.length > 0 && (
-            <div style={{ background: "#161b22", border: "1px solid #30363d", borderRadius: "6px", padding: "16px", marginBottom: "16px" }}>
-              <div style={{ fontSize: "9px", color: "#fc8181", letterSpacing: "2px", marginBottom: "12px", fontWeight: "bold" }}>
+            <div style={{ background: "#161b22", border: "1px solid #30363d", borderRadius: "6px", padding: m ? "14px" : "16px", marginBottom: m ? "12px" : "16px" }}>
+              <div style={{ fontSize: m ? "10px" : "9px", color: "#fc8181", letterSpacing: "2px", marginBottom: "12px", fontWeight: "bold" }}>
                 CRITICAL NOTES ({step.warnings.length})
               </div>
               {step.warnings.map((w, i) => (
-                <div key={i} style={{ display: "flex", gap: "10px", marginBottom: "8px", fontSize: "11px", color: "#8b949e", lineHeight: "1.5" }}>
-                  <span style={{ color: "#fc8181", minWidth: "12px" }}>!</span>
+                <div key={i} style={{ display: "flex", gap: "10px", marginBottom: "10px", fontSize: m ? "13px" : "11px", color: "#8b949e", lineHeight: m ? "1.7" : "1.5" }}>
+                  <span style={{ color: "#fc8181", minWidth: "12px", flexShrink: 0 }}>!</span>
                   <span>{w}</span>
                 </div>
               ))}
@@ -1139,8 +1269,8 @@ export default function MudMotorDiagram() {
           {step.resources && step.resources.length > 0 && (
             <CollapsibleSection title="RESOURCES & REFERENCES" color="#b794f4">
               {step.resources.map((r, i) => (
-                <div key={i} style={{ marginBottom: "8px" }}>
-                  <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: "11px", color: "#b794f4", textDecoration: "none", borderBottom: "1px solid #b794f433" }}>
+                <div key={i} style={{ marginBottom: "10px" }}>
+                  <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: m ? "13px" : "11px", color: "#b794f4", textDecoration: "none", borderBottom: "1px solid #b794f433", lineHeight: "1.6" }}>
                     {r.label}
                   </a>
                 </div>
@@ -1149,26 +1279,33 @@ export default function MudMotorDiagram() {
           )}
 
           {/* Navigation */}
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px", gap: "12px" }}>
-            <button onClick={() => setActive(Math.max(0, active - 1))} disabled={active === 0} style={{
-              padding: "10px 20px", background: active === 0 ? "#21262d" : "#161b22",
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: m ? "16px" : "20px", gap: "12px", paddingBottom: m ? "24px" : "0" }}>
+            <button onClick={() => { setActive(Math.max(0, active - 1)); window.scrollTo(0, 0); }} disabled={active === 0} style={{
+              padding: m ? "12px 18px" : "10px 20px", background: active === 0 ? "#21262d" : "#161b22",
               border: `1px solid ${active === 0 ? "#30363d" : step.color}`, borderRadius: "4px",
               color: active === 0 ? "#6e7681" : step.color, cursor: active === 0 ? "not-allowed" : "pointer",
-              fontSize: "11px", letterSpacing: "1px", fontFamily: "monospace",
+              fontSize: m ? "13px" : "11px", letterSpacing: "1px", fontFamily: "monospace",
             }}>PREV</button>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              {steps.map((s, i) => (
-                <div key={i} onClick={() => setActive(i)} style={{
-                  width: i === active ? "20px" : "6px", height: "6px", borderRadius: "3px",
-                  background: i === active ? step.color : "#21262d", cursor: "pointer", transition: "all 0.2s",
-                }} />
-              ))}
-            </div>
-            <button onClick={() => setActive(Math.min(steps.length - 1, active + 1))} disabled={active === steps.length - 1} style={{
-              padding: "10px 20px", background: active === steps.length - 1 ? "#21262d" : "#161b22",
+            {!m && (
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                {steps.map((s, i) => (
+                  <div key={i} onClick={() => setActive(i)} style={{
+                    width: i === active ? "20px" : "6px", height: "6px", borderRadius: "3px",
+                    background: i === active ? step.color : "#21262d", cursor: "pointer", transition: "all 0.2s",
+                  }} />
+                ))}
+              </div>
+            )}
+            {m && (
+              <div style={{ fontSize: "12px", color: "#6e7681", display: "flex", alignItems: "center", fontFamily: "monospace" }}>
+                {active + 1} / {steps.length}
+              </div>
+            )}
+            <button onClick={() => { setActive(Math.min(steps.length - 1, active + 1)); window.scrollTo(0, 0); }} disabled={active === steps.length - 1} style={{
+              padding: m ? "12px 18px" : "10px 20px", background: active === steps.length - 1 ? "#21262d" : "#161b22",
               border: `1px solid ${active === steps.length - 1 ? "#30363d" : step.color}`, borderRadius: "4px",
               color: active === steps.length - 1 ? "#6e7681" : step.color, cursor: active === steps.length - 1 ? "not-allowed" : "pointer",
-              fontSize: "11px", letterSpacing: "1px", fontFamily: "monospace",
+              fontSize: m ? "13px" : "11px", letterSpacing: "1px", fontFamily: "monospace",
             }}>NEXT</button>
           </div>
         </div>
